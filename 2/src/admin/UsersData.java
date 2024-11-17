@@ -55,11 +55,11 @@ public class UsersData extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText("<group-image>");
+        jLabel1.setText("<user-image>");
 
-        jLabel2.setText("<group-id>");
+        jLabel2.setText("<user-id>");
 
-        jLabel3.setText("<group-name>");
+        jLabel3.setText("<user-name>");
 
         jLabel4.setText("<date-of-creation>");
 
