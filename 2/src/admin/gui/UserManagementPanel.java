@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 public class UserManagementPanel extends JPanel {
 
@@ -24,20 +25,36 @@ public class UserManagementPanel extends JPanel {
         userTable = new JTable(model);
         JScrollPane tableScrollPane = new JScrollPane(userTable);
 
+        // Enable sorting
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+        userTable.setRowSorter(sorter);
+
         // Buttons
         JPanel buttonPanel = new JPanel(new FlowLayout());
         JButton addButton = new JButton("Add User");
         JButton removeButton = new JButton("Remove User");
+        JButton sortByNameButton = new JButton("Sort by Full Name");
+        JButton sortByUsernameButton = new JButton("Sort by Username");
+        JButton sortByCreationDateButton = new JButton("Sort by Creation Date");
+
         buttonPanel.add(addButton);
         buttonPanel.add(removeButton);
+        buttonPanel.add(sortByNameButton);
+        buttonPanel.add(sortByUsernameButton);
+        buttonPanel.add(sortByCreationDateButton);
 
         // Add components to panel
         add(tableScrollPane, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        add(buttonPanel, BorderLayout.NORTH);
 
         // Event listeners
         addButton.addActionListener(e -> addUser());
         removeButton.addActionListener(e -> removeUser());
+
+        // Sort buttons
+        sortByNameButton.addActionListener(e -> sorter.setSortKeys(List.of(new RowSorter.SortKey(1, SortOrder.ASCENDING))));
+        sortByUsernameButton.addActionListener(e -> sorter.setSortKeys(List.of(new RowSorter.SortKey(0, SortOrder.ASCENDING))));
+        sortByCreationDateButton.addActionListener(e -> sorter.setSortKeys(List.of(new RowSorter.SortKey(3, SortOrder.ASCENDING))));
 
         // Load user data into table
         refreshUserTable();
@@ -168,6 +185,6 @@ public class UserManagementPanel extends JPanel {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        
+
     }
 }
