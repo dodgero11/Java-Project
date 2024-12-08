@@ -5,17 +5,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDAO {
-    private static final String URL = "jdbc:mysql://localhost:3306/your_db";
+    private static final String URL = "jdbc:mysql://localhost:3306/java";
     private static final String USER = "root";  // Replace with your DB username
-    private static final String PASSWORD = "password";  // Replace with your DB password
+    private static final String PASSWORD = "7z9aZbse928WJUf";  // Replace with your DB password
 
     private Connection getConnection() throws SQLException {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection temp_connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            System.out.println("Connected to the database!");
+        } catch (ClassNotFoundException e) {
+            System.err.println("JDBC Driver not found: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("Error connecting to the database: " + e.getMessage());
+        }
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
     // Add a user to the database
     public boolean addUser(String username, String fullName, String address, Date birthDate, String gender, String email) {
-        String sql = "INSERT INTO users (username, full_name, address, birth_date, gender, email) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO USERS (username, full_name, address, birth_date, gender, email) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
             stmt.setString(2, fullName);

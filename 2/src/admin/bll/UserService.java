@@ -31,5 +31,3 @@ public class UserService {
         return userDAO.searchUsers(searchTerm);
     }
 }
-    
-}

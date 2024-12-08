@@ -32,7 +32,7 @@ public class AdminDashboardPanel extends JFrame {
         // Login History Panel
         JMenu loginHistoryMenu = new JMenu("Login History");
         JMenuItem viewLoginHistory = new JMenuItem("View Login History");
-        
+
         loginHistoryMenu.add(viewLoginHistory);
         menuBar.add(loginHistoryMenu);
 
