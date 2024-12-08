@@ -3,6 +3,7 @@ package bll;
 import dao.UserDAO;
 import java.sql.Date;
 import java.util.List;
+import java.sql.SQLException;
 
 public class UserService {
     private UserDAO userDAO;
@@ -30,4 +31,10 @@ public class UserService {
     public List<String[]> searchUsers(String searchTerm) {
         return userDAO.searchUsers(searchTerm);
     }
+
+    // Get all users
+    public List<User> getAllUsers() throws SQLException {
+        return userDAO.getAllUsers();
+    }
 }
+

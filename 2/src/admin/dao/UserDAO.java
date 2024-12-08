@@ -3,6 +3,7 @@ package dao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import bll.*;
 
 public class UserDAO {
     private static final String URL = "jdbc:mysql://localhost:3306/java";
@@ -20,6 +21,28 @@ public class UserDAO {
             System.err.println("Error connecting to the database: " + e.getMessage());
         }
         return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+
+    public List<User> getAllUsers() throws SQLException {
+        List<User> users = new ArrayList<>();
+        String query = "SELECT username, full_name, address, email, gender, birth_date FROM users";
+        
+        try (Connection conn = getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query)) {
+            
+            while (rs.next()) {
+                User user = new User();
+                user.setUsername(rs.getString("username"));
+                user.setFullName(rs.getString("full_name"));
+                user.setAddress(rs.getString("address"));
+                user.setEmail(rs.getString("email"));
+                user.setGender(rs.getString("gender"));
+                user.setBirthDate(rs.getDate("birth_date"));
+                users.add(user);
+            }
+        }
+        return users;
     }
 
     // Add a user to the database

@@ -1,8 +1,13 @@
 package gui;
 
+import bll.User;
 import bll.UserService;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.sql.Date;
+import java.sql.SQLException;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
@@ -35,19 +40,7 @@ public class UserManagementPanel extends JPanel {
         removeButton.addActionListener(e -> removeUser());
 
         // Load user data into table
-        loadUserData();
-    }
-
-    // Method to load user data into the table (dummy data for now)
-    private void loadUserData() {
-        DefaultTableModel model = (DefaultTableModel) userTable.getModel();
-        model.setRowCount(0);  // Clear existing rows
-
-        // Example: Populate the table with dummy data
-        Date birthDate = Date.valueOf("1990-01-01");
-        Date birthDate2 = Date.valueOf("1990-01-01");
-        model.addRow(new Object[]{"johndoe", "John Doe", "123 Main St", birthDate, "johndoe@email.com", "Male"});
-        model.addRow(new Object[]{"janedoe", "Jane Doe", "456 Oak St", birthDate2, "janedoe@email.com", "Female"});
+        refreshUserTable();
     }
 
     // Add a new user (you will integrate this with your service/database layer later)
@@ -132,21 +125,49 @@ public class UserManagementPanel extends JPanel {
         UserService userService = new UserService();
         if (userService.addUser(username, fullName, address, Date.valueOf(birthDate), gender, email)) {
             JOptionPane.showMessageDialog(this, "User added successfully!");
-            
-            // Add user to the table
-            DefaultTableModel model = (DefaultTableModel) userTable.getModel();
-            model.addRow(new Object[]{username, fullName, address, birthDate, gender, email});
+            refreshUserTable(); // Refresh UI table
         }
     }
 
-    // Remove selected user (you will integrate this with your service/database layer later)
+    // Remove selected user
     private void removeUser() {
-        int selectedRow = userTable.getSelectedRow();
-        if (selectedRow != -1) {
-            DefaultTableModel model = (DefaultTableModel) userTable.getModel();
-            model.removeRow(selectedRow);
-        } else {
-            JOptionPane.showMessageDialog(this, "Please select a user to remove.");
+        String username = JOptionPane.showInputDialog(this, "Enter the username to delete:");
+        UserService userService = new UserService();
+        if (username != null && !username.trim().isEmpty()) {
+            try {
+                boolean success = userService.removeUser(username.trim());
+                if (success) {
+                    JOptionPane.showMessageDialog(this, "User deleted successfully.");
+                    refreshUserTable(); // Refresh UI table
+                } else {
+                    JOptionPane.showMessageDialog(this, "User not found or could not be deleted.");
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "An error occurred: " + ex.getMessage());
+            }
         }
+    }
+
+    private void refreshUserTable() {
+        DefaultTableModel model = (DefaultTableModel) userTable.getModel();
+        model.setRowCount(0); // Clear existing rows
+        UserService userService = new UserService();
+
+        try {
+            List<User> users = userService.getAllUsers(); // Fetch users from DB
+            for (User user : users) {
+                model.addRow(new Object[]{
+                    user.getUsername(),
+                    user.getFullName(),
+                    user.getAddress(),
+                    user.getEmail(),
+                    user.getGender(),
+                    user.getBirthDate()
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
     }
 }
