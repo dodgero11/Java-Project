@@ -3,17 +3,18 @@ package bll;
 import java.sql.Date;
 
 public class SpamReport {
-    private int reportId;
+    private String reportId;
     private String reportedBy;
     private String reportedUser;
     private String reason;
+    private String status;
     private Date createdAt;
 
     // Getters and Setters
-    public int getReportId() {
+    public String getReportId() {
         return reportId;
     }
-    public void setReportId(int reportId) {
+    public void setReportId(String reportId) {
         this.reportId = reportId;
     }
     public String getReportedBy() {
@@ -33,6 +34,12 @@ public class SpamReport {
     }
     public void setReason(String reason) {
         this.reason = reason;
+    }
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
     }
     public Date getCreatedAt() {
         return createdAt;

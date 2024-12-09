@@ -44,5 +44,10 @@ public class UserService {
     public List<User> getFriends(String username) throws SQLException {
         return userDAO.getFriends(username);
     }
+
+    public boolean deactivateUserService(User user) {
+        user.setIsActive("Deactivated");
+        return userDAO.updateUser(user);
+    }
 }
 

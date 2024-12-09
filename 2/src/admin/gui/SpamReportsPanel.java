@@ -4,6 +4,10 @@ import java.awt.BorderLayout;
 import java.util.List;
 
 import java.awt.FlowLayout;
+import java.sql.SQLException;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -14,9 +18,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 import bll.SpamReport;
-import bll.SpamService;
+import bll.SpamReportService;
+import bll.User;
+import bll.UserService;
 
 public class SpamReportsPanel extends JPanel {
+
     private JTable spamReportsTable;
     private JTextField filterTextField;
 
@@ -24,10 +31,16 @@ public class SpamReportsPanel extends JPanel {
         setLayout(new BorderLayout());
 
         // Table columns
-        String[] columns = {"Report ID", "Reported By", "Reported User", "Reason", "Created At"};
+        String[] columns = {"Report ID", "Reported By", "Reported User", "Reason", "Status", "Created At"};
         DefaultTableModel model = new DefaultTableModel(columns, 0);
         spamReportsTable = new JTable(model);
         JScrollPane tableScrollPane = new JScrollPane(spamReportsTable);
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+
+        // Buttons
+        JButton refreshUserPanelButton = new JButton("Refresh");
+
+        buttonPanel.add(refreshUserPanelButton);
 
         // Filter text field
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -38,6 +51,23 @@ public class SpamReportsPanel extends JPanel {
         // Enable sorting
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
         spamReportsTable.setRowSorter(sorter);
+
+        // Refresh button listener
+        refreshUserPanelButton.addActionListener(e -> refreshSpamReportsTable());
+
+        // Mouse listener for row clicks
+        spamReportsTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (evt.getClickCount() == 2) { // Double-click event
+                    int row = spamReportsTable.getSelectedRow();
+                    if (row != -1) {
+                        String username = spamReportsTable.getValueAt(row, 0).toString(); // Fetch username
+                        openSpamReportDetails(username);
+                    }
+                }
+            }
+        });
 
         // Filter text field listener
         filterTextField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
@@ -63,6 +93,7 @@ public class SpamReportsPanel extends JPanel {
         // Add components to panel
         add(tableScrollPane, BorderLayout.CENTER);
         add(filterPanel, BorderLayout.SOUTH);
+        add(buttonPanel, BorderLayout.NORTH);
 
         // Load spam reports data
         refreshSpamReportsTable();
@@ -71,20 +102,40 @@ public class SpamReportsPanel extends JPanel {
     private void refreshSpamReportsTable() {
         DefaultTableModel model = (DefaultTableModel) spamReportsTable.getModel();
         model.setRowCount(0); // Clear the table
-        SpamService spamService = new SpamService();
+        SpamReportService spamReportService = new SpamReportService();
         try {
-            List<SpamReport> spamReports = spamService.getSpamReports();
+            List<SpamReport> spamReports = spamReportService.getSpamReports();
             for (SpamReport spamReport : spamReports) {
                 model.addRow(new Object[]{
                     spamReport.getReportId(),
                     spamReport.getReportedBy(),
                     spamReport.getReportedUser(),
                     spamReport.getReason(),
+                    spamReport.getStatus(),
                     spamReport.getCreatedAt()
                 });
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void openSpamReportDetails(String id) {
+        JFrame spamReportDetailsFrame = new JFrame("Spam Report Details - " + id);
+        spamReportDetailsFrame.setSize(600, 400);
+        spamReportDetailsFrame.setLocationRelativeTo(this);
+        spamReportDetailsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        SpamReportService spamReportService = new SpamReportService();
+        SpamReport spamReport = null;
+        try {
+            spamReport = spamReportService.getSpamReportById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        SpamReportDetailsPanel spamReportDetailsPanel = new SpamReportDetailsPanel(spamReport);
+        spamReportDetailsFrame.add(spamReportDetailsPanel);
+
+        spamReportDetailsFrame.setVisible(true);
     }
 }

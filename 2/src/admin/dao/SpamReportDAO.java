@@ -23,7 +23,7 @@ public class SpamReportDAO {
     }
 
     public List<SpamReport> getSpamReports() throws SQLException {
-        String sql = "SELECT report_id, reported_by, reported_user, reason, created_at FROM SPAM_REPORTS";
+        String sql = "SELECT report_id, reported_by, reported_user, reason, status, created_at FROM SPAM_REPORTS";
         List<SpamReport> spamReports = new ArrayList<>();
         
         try (Connection conn = getConnection();
@@ -32,14 +32,46 @@ public class SpamReportDAO {
             
             while (rs.next()) {
                 SpamReport report = new SpamReport();
-                report.setReportId(rs.getInt("report_id"));
+                report.setReportId(rs.getString("report_id"));
                 report.setReportedBy(rs.getString("reported_by"));
                 report.setReportedUser(rs.getString("reported_user"));
                 report.setReason(rs.getString("reason"));
+                report.setStatus(rs.getString("status"));
                 report.setCreatedAt(rs.getDate("created_at"));
                 spamReports.add(report);
             }
         }
         return spamReports;
+    }
+
+    public SpamReport getSpamReportById(String reportId) throws SQLException {
+        String sql = "SELECT report_id, reported_by, reported_user, reason, status, created_at FROM SPAM_REPORTS WHERE report_id = ?";
+        SpamReport report = null;
+        
+        try (Connection conn = getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, reportId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                report = new SpamReport();
+                report.setReportId(rs.getString("report_id"));
+                report.setReportedBy(rs.getString("reported_by"));
+                report.setReportedUser(rs.getString("reported_user"));
+                report.setReason(rs.getString("reason"));
+                report.setStatus(rs.getString("status"));
+                report.setCreatedAt(rs.getDate("created_at"));
+            }
+        }
+        return report;
+    }
+
+    public void dismissReport(String reportId) throws SQLException {
+        String sql = "UPDATE SPAM_REPORTS SET status = 'Resolved' WHERE report_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, reportId);
+            stmt.executeUpdate();
+        }
     }
 }

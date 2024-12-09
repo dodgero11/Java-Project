@@ -55,20 +55,20 @@ public class UserManagementPanel extends JPanel {
         addButton.addActionListener(e -> addUser());
         removeButton.addActionListener(e -> removeUser());
         refreshUserPanelButton.addActionListener(e -> refreshUserTable());
-        
+
         // Mouse listener for row clicks
         userTable.addMouseListener(new java.awt.event.MouseAdapter() {
-        @Override
-        public void mouseClicked(java.awt.event.MouseEvent evt) {
-            if (evt.getClickCount() == 2) { // Double-click event
-                int row = userTable.getSelectedRow();
-                if (row != -1) {
-                    String username = userTable.getValueAt(row, 0).toString(); // Fetch username
-                    openUserDetails(username);
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (evt.getClickCount() == 2) { // Double-click event
+                    int row = userTable.getSelectedRow();
+                    if (row != -1) {
+                        String username = userTable.getValueAt(row, 0).toString(); // Fetch username
+                        openUserDetails(username);
+                    }
                 }
             }
-        }
-    });
+        });
 
         // Filter text field listener
         filterTextField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
@@ -246,7 +246,7 @@ public class UserManagementPanel extends JPanel {
         }
         UserDetailsPanel userDetailsPanel = new UserDetailsPanel(user);
         userDetailsFrame.add(userDetailsPanel);
-    
+
         userDetailsFrame.setVisible(true);
     }
 }

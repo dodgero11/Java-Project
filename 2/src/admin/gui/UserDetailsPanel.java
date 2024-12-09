@@ -170,7 +170,7 @@ public class UserDetailsPanel extends JPanel {
         int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to deactivate this account?", "Deactivate Account", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                user.setIsActive("deactivated");
+                user.setIsActive("Deactivated");
                 if (userService.updateUser(user)) {
                     JOptionPane.showMessageDialog(this, "Account deactivated successfully!");
                     statusLabel.setText("Deactivated");
@@ -187,7 +187,7 @@ public class UserDetailsPanel extends JPanel {
         int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to activate this account?", "Activate Account", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                user.setIsActive("active");
+                user.setIsActive("Active");
                 if (userService.updateUser(user)) {
                     JOptionPane.showMessageDialog(this, "Account activated successfully!");
                     statusLabel.setText("Active");
