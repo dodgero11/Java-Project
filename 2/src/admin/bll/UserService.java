@@ -13,8 +13,8 @@ public class UserService {
     }
 
     // Add a new user
-    public boolean addUser(String username, String fullName, String address, Date birthDate, String gender, String email) {
-        return userDAO.addUser(username, fullName, address, birthDate, gender, email);
+    public boolean addUser(User user) {
+        return userDAO.addUser(user);
     }
 
     // Remove a user
@@ -23,18 +23,26 @@ public class UserService {
     }
 
     // Update user information
-    public boolean updateUser(String username, String fullName, String address, Date birthDate, String gender, String email) {
-        return userDAO.updateUser(username, fullName, address, birthDate, gender, email);
-    }
-
-    // Search for users by name or username
-    public List<String[]> searchUsers(String searchTerm) {
-        return userDAO.searchUsers(searchTerm);
+    public boolean updateUser(User user) {
+        return userDAO.updateUser(user);
     }
 
     // Get all users
     public List<User> getAllUsers() throws SQLException {
         return userDAO.getAllUsers();
+    }
+
+    public List<User> getUsersByUsername(String username) throws SQLException {
+        return userDAO.getUsersByUsername(username);
+    }
+    
+    public List<String[]> getLoginHistory(String username) throws SQLException {
+        //return userDAO.getLoginHistory(username);
+        return null;
+    }
+
+    public List<User> getFriends(String username) throws SQLException {
+        return userDAO.getFriends(username);
     }
 }
 

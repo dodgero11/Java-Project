@@ -7,14 +7,13 @@ import bll.*;
 
 public class UserDAO {
     private static final String URL = "jdbc:mysql://localhost:3306/java";
-    private static final String USER = "root";  // Replace with your DB username
-    private static final String PASSWORD = "7z9aZbse928WJUf";  // Replace with your DB password
+    private static final String USER = "root"; 
+    private static final String PASSWORD = "7z9aZbse928WJUf"; 
 
     private Connection getConnection() throws SQLException {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection temp_connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Connected to the database!");
         } catch (ClassNotFoundException e) {
             System.err.println("JDBC Driver not found: " + e.getMessage());
         } catch (SQLException e) {
@@ -25,7 +24,7 @@ public class UserDAO {
 
     public List<User> getAllUsers() throws SQLException {
         List<User> users = new ArrayList<>();
-        String query = "SELECT username, full_name, address, email, gender, birth_date FROM users";
+        String query = "SELECT username, password, full_name, address, email, gender, birth_date, status, created_at FROM users";
         
         try (Connection conn = getConnection();
             Statement stmt = conn.createStatement();
@@ -34,11 +33,14 @@ public class UserDAO {
             while (rs.next()) {
                 User user = new User();
                 user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
                 user.setFullName(rs.getString("full_name"));
                 user.setAddress(rs.getString("address"));
                 user.setEmail(rs.getString("email"));
                 user.setGender(rs.getString("gender"));
                 user.setBirthDate(rs.getDate("birth_date"));
+                user.setCreationDate(rs.getDate("created_at"));
+                user.setIsActive(rs.getString("status"));
                 users.add(user);
             }
         }
@@ -46,15 +48,16 @@ public class UserDAO {
     }
 
     // Add a user to the database
-    public boolean addUser(String username, String fullName, String address, Date birthDate, String gender, String email) {
-        String sql = "INSERT INTO USERS (username, full_name, address, birth_date, gender, email) VALUES (?, ?, ?, ?, ?, ?)";
+    public boolean addUser(User user) {
+        String sql = "INSERT INTO USERS (username, password, full_name, address, birth_date, gender, email) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, username);
-            stmt.setString(2, fullName);
-            stmt.setString(3, address);
-            stmt.setDate(4, birthDate);
-            stmt.setString(5, gender);
-            stmt.setString(6, email);
+            stmt.setString(1, user.getUsername());
+            stmt.setString(2, user.getPassword());
+            stmt.setString(3, user.getFullName());
+            stmt.setString(4, user.getAddress());
+            stmt.setDate(5, user.getBirthDate());
+            stmt.setString(6, user.getGender());
+            stmt.setString(7, user.getEmail());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -75,15 +78,17 @@ public class UserDAO {
     }
 
     // Update user information
-    public boolean updateUser(String username, String fullName, String address, Date birthDate, String gender, String email) {
-        String sql = "UPDATE users SET full_name = ?, address = ?, birth_date = ?, gender = ?, email = ? WHERE username = ?";
+    public boolean updateUser(User user) {
+        String sql = "UPDATE users SET full_name = ?, password = ? , address = ?, birth_date = ?, gender = ?, email = ?, status = ? WHERE username = ?";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, fullName);
-            stmt.setString(2, address);
-            stmt.setDate(3, birthDate);
-            stmt.setString(4, gender);
-            stmt.setString(5, email);
-            stmt.setString(6, username);
+            stmt.setString(1, user.getFullName());
+            stmt.setString(2, user.getPassword());
+            stmt.setString(3, user.getAddress());
+            stmt.setDate(4, user.getBirthDate());
+            stmt.setString(5, user.getGender());
+            stmt.setString(6, user.getEmail());
+            stmt.setString(7, user.getIsActive());
+            stmt.setString(8, user.getUsername());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -92,25 +97,62 @@ public class UserDAO {
     }
 
     // Search for users by name or username
-    public List<String[]> searchUsers(String searchTerm) {
-        String sql = "SELECT * FROM users WHERE username LIKE ? OR full_name LIKE ?";
-        List<String[]> users = new ArrayList<>();
+    public List<User> getUsersByUsername(String searchTerm) {
+        String sql = "SELECT * FROM users WHERE username LIKE ?";
+        List<User> users = new ArrayList<>();
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, "%" + searchTerm + "%");
-            stmt.setString(2, "%" + searchTerm + "%");
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                String[] user = new String[6];
-                user[0] = rs.getString("username");
-                user[1] = rs.getString("full_name");
-                user[2] = rs.getString("address");
-                user[3] = rs.getDate("birth_date").toString();
-                user[4] = rs.getString("gender");
-                user[5] = rs.getString("email");
+                User user = new User();
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
+                user.setFullName(rs.getString("full_name"));
+                user.setAddress(rs.getString("address"));
+                user.setEmail(rs.getString("email"));
+                user.setGender(rs.getString("gender"));
+                user.setBirthDate(rs.getDate("birth_date"));
+                user.setCreationDate(rs.getDate("created_at"));
+                user.setIsActive(rs.getString("status"));
                 users.add(user);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+        return users;
+    }
+
+    public List<User> getFriends(String username) throws SQLException {
+        String sql = """
+            SELECT u.*
+            FROM USERS u
+            JOIN USER_FRIENDS uf 
+                ON (u.user_id = uf.friend_id AND uf.user_id = (
+                    SELECT user_id FROM USERS WHERE username = ?))
+                OR (u.user_id = uf.user_id AND uf.friend_id = (
+                    SELECT user_id FROM USERS WHERE username = ?))
+        """;
+        List<User> users = new ArrayList<>();
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // Set the username parameter twice for the subqueries
+            stmt.setString(1, username);
+            stmt.setString(2, username);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                User user = new User();
+                user.setUsername(rs.getString("username"));
+                user.setFullName(rs.getString("full_name"));
+                user.setAddress(rs.getString("address"));
+                user.setEmail(rs.getString("email"));
+                user.setGender(rs.getString("gender"));
+                user.setBirthDate(rs.getDate("birth_date"));
+                user.setCreationDate(rs.getDate("created_at"));
+                user.setIsActive(rs.getString("status"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e; // Optionally rethrow the exception
         }
         return users;
     }

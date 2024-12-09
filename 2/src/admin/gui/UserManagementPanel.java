@@ -15,12 +15,19 @@ import javax.swing.table.TableRowSorter;
 public class UserManagementPanel extends JPanel {
 
     private JTable userTable;
+    private JTextField filterTextField;
 
     public UserManagementPanel() {
         setLayout(new BorderLayout());
 
+        // Filter text field
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        filterTextField = new JTextField(20); // 20 columns wide
+        filterPanel.add(new JLabel("Filter:"));
+        filterPanel.add(filterTextField);
+
         // Table to display users
-        String[] columns = {"Username", "Full Name", "Address", "Birthdate", "Email", "Gender"};
+        String[] columns = {"Username", "Full Name", "Address", "Birthdate", "Email", "Gender", "Creation Date", "Active"};
         DefaultTableModel model = new DefaultTableModel(columns, 0);
         userTable = new JTable(model);
         JScrollPane tableScrollPane = new JScrollPane(userTable);
@@ -33,28 +40,56 @@ public class UserManagementPanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout());
         JButton addButton = new JButton("Add User");
         JButton removeButton = new JButton("Remove User");
-        JButton sortByNameButton = new JButton("Sort by Full Name");
-        JButton sortByUsernameButton = new JButton("Sort by Username");
-        JButton sortByCreationDateButton = new JButton("Sort by Creation Date");
+        JButton refreshUserPanelButton = new JButton("Refresh");
 
+        buttonPanel.add(refreshUserPanelButton);
         buttonPanel.add(addButton);
         buttonPanel.add(removeButton);
-        buttonPanel.add(sortByNameButton);
-        buttonPanel.add(sortByUsernameButton);
-        buttonPanel.add(sortByCreationDateButton);
 
         // Add components to panel
         add(tableScrollPane, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.NORTH);
+        add(filterPanel, BorderLayout.SOUTH);
 
         // Event listeners
         addButton.addActionListener(e -> addUser());
         removeButton.addActionListener(e -> removeUser());
+        refreshUserPanelButton.addActionListener(e -> refreshUserTable());
+        
+        // Mouse listener for row clicks
+        userTable.addMouseListener(new java.awt.event.MouseAdapter() {
+        @Override
+        public void mouseClicked(java.awt.event.MouseEvent evt) {
+            if (evt.getClickCount() == 2) { // Double-click event
+                int row = userTable.getSelectedRow();
+                if (row != -1) {
+                    String username = userTable.getValueAt(row, 0).toString(); // Fetch username
+                    openUserDetails(username);
+                }
+            }
+        }
+    });
 
-        // Sort buttons
-        sortByNameButton.addActionListener(e -> sorter.setSortKeys(List.of(new RowSorter.SortKey(1, SortOrder.ASCENDING))));
-        sortByUsernameButton.addActionListener(e -> sorter.setSortKeys(List.of(new RowSorter.SortKey(0, SortOrder.ASCENDING))));
-        sortByCreationDateButton.addActionListener(e -> sorter.setSortKeys(List.of(new RowSorter.SortKey(3, SortOrder.ASCENDING))));
+        // Filter text field listener
+        filterTextField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                String text = filterTextField.getText();
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                String text = filterTextField.getText();
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                String text = filterTextField.getText();
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+            }
+        });
 
         // Load user data into table
         refreshUserTable();
@@ -64,6 +99,7 @@ public class UserManagementPanel extends JPanel {
     private void addUser() {
         // Create temporary variables to hold user data
         String username = "";
+        String password = "";
         String fullName = "";
         String address = "";
         String birthDate = "";
@@ -71,12 +107,16 @@ public class UserManagementPanel extends JPanel {
         String gender = "";
 
         // Create a panel to hold input fields
-        JPanel inputPanel = new JPanel(new GridLayout(6, 2, 10, 10));
+        JPanel inputPanel = new JPanel(new GridLayout(7, 2, 10, 10));
 
         // Create labels and text fields
         inputPanel.add(new JLabel("Username:"));
         JTextField usernameField = new JTextField();
         inputPanel.add(usernameField);
+
+        inputPanel.add(new JLabel("Password:"));
+        JTextField passwordField = new JTextField();
+        inputPanel.add(passwordField);
 
         inputPanel.add(new JLabel("Full Name:"));
         JTextField fullNameField = new JTextField();
@@ -104,13 +144,14 @@ public class UserManagementPanel extends JPanel {
         // If the user clicks OK, retrieve the data
         if (result == JOptionPane.OK_OPTION) {
             username = usernameField.getText();
+            password = passwordField.getText();
             fullName = fullNameField.getText();
             address = addressField.getText();
             birthDate = birthdateField.getText();
             email = emailField.getText();
             gender = (String) genderComboBox.getSelectedItem();
 
-            if (username.isEmpty() || fullName.isEmpty() || address.isEmpty() || birthDate.isEmpty() || email.isEmpty()) {
+            if (username.isEmpty() || password.isEmpty() || fullName.isEmpty() || address.isEmpty() || birthDate.isEmpty() || email.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "All fields must be filled!", "Error", JOptionPane.ERROR_MESSAGE);
                 addUser();
                 return;
@@ -140,7 +181,8 @@ public class UserManagementPanel extends JPanel {
 
         // Add user to the database
         UserService userService = new UserService();
-        if (userService.addUser(username, fullName, address, Date.valueOf(birthDate), gender, email)) {
+        User newUser = new User(username, password, fullName, address, Date.valueOf(birthDate), gender, email);
+        if (userService.addUser(newUser)) {
             JOptionPane.showMessageDialog(this, "User added successfully!");
             refreshUserTable(); // Refresh UI table
         }
@@ -167,7 +209,7 @@ public class UserManagementPanel extends JPanel {
 
     private void refreshUserTable() {
         DefaultTableModel model = (DefaultTableModel) userTable.getModel();
-        model.setRowCount(0); // Clear existing rows
+        model.setRowCount(0);
         UserService userService = new UserService();
 
         try {
@@ -178,13 +220,33 @@ public class UserManagementPanel extends JPanel {
                     user.getFullName(),
                     user.getAddress(),
                     user.getEmail(),
+                    user.getBirthDate(),
                     user.getGender(),
-                    user.getBirthDate()
+                    user.getCreationDate(),
+                    user.getIsActive()
                 });
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
 
+    private void openUserDetails(String username) {
+        JFrame userDetailsFrame = new JFrame("User Details - " + username);
+        userDetailsFrame.setSize(600, 400);
+        userDetailsFrame.setLocationRelativeTo(this);
+        userDetailsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        UserService userService = new UserService();
+        User user = null;
+        try {
+            user = userService.getUsersByUsername(username).get(0);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        UserDetailsPanel userDetailsPanel = new UserDetailsPanel(user);
+        userDetailsFrame.add(userDetailsPanel);
+    
+        userDetailsFrame.setVisible(true);
     }
 }

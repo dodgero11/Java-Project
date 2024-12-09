@@ -36,9 +36,15 @@ public class AdminDashboardPanel extends JFrame {
         loginHistoryMenu.add(viewLoginHistory);
         menuBar.add(loginHistoryMenu);
 
-        setJMenuBar(menuBar);
+        // Spam Reports Panel
+        JMenu spamReportsMenu = new JMenu("Spam Reports");
+        JMenuItem viewSpamReports = new JMenuItem("View Spam Reports");
+
+        spamReportsMenu.add(viewSpamReports);
+        menuBar.add(spamReportsMenu);
 
         // Main panel
+        setJMenuBar(menuBar);
         mainPanel = new JPanel(new BorderLayout());
         add(mainPanel);
 
@@ -46,6 +52,7 @@ public class AdminDashboardPanel extends JFrame {
         viewUsers.addActionListener(e -> showUserManagement());
         viewGroups.addActionListener(e -> showGroupManagement());
         viewLoginHistory.addActionListener(e -> showLoginHistory());
+        viewSpamReports.addActionListener(e -> showSpamReportsPanel());
     }
 
     private void showUserManagement() {
@@ -66,6 +73,14 @@ public class AdminDashboardPanel extends JFrame {
     private void showLoginHistory() {
         mainPanel.removeAll();
         mainPanel.add(new LoginHistoryPanel());
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
+    private void showSpamReportsPanel() {
+        // You can create and show the Spam Reports panel here
+        mainPanel.removeAll();
+        mainPanel.add(new SpamReportsPanel());  // Assuming you have a SpamReportsPanel created
         mainPanel.revalidate();
         mainPanel.repaint();
     }
