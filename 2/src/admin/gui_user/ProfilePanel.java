@@ -146,6 +146,7 @@ public class ProfilePanel extends JPanel {
                 return;
             }
 
+            // Update password in database
             user.setPassword(confirmPassword);
 
             boolean success = userService.updateUser(user);

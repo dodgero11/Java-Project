@@ -26,7 +26,6 @@ public class UserService {
         return userDAO.updateUser(user);
     }
 
-    // Get all users
     public List<User> getAllUsers() throws SQLException {
         return userDAO.getAllUsers();
     }

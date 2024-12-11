@@ -30,7 +30,7 @@ public class FriendsPanel extends JPanel {
 
         // Filter text field
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        filterTextField = new JTextField(10); // 20 columns wide
+        filterTextField = new JTextField(10); 
         filterPanel.add(new JLabel("Filter:"));
         filterPanel.add(filterTextField);
 
@@ -100,7 +100,6 @@ public class FriendsPanel extends JPanel {
             e.printStackTrace();
         }
     }
-
 
     // Remove friend
     private void removeFriend() {
@@ -176,7 +175,7 @@ public class FriendsPanel extends JPanel {
                 return;
             }
             boolean success = false;
-            
+
             String requesterUsername = requestsTable.getValueAt(selectedRow, 0).toString();
             try {
                 success = userService.acceptFriendRequest(requesterUsername, currentUser.getUsername());
@@ -194,7 +193,6 @@ public class FriendsPanel extends JPanel {
                         "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
-
 
         // Decline button
         declineButton.addActionListener(e -> {

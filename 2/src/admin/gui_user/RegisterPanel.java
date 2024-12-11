@@ -67,7 +67,7 @@ public class RegisterPanel extends JPanel {
             return;
         }
 
-        // Validate Email format
+        // Validate email format
         if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
             JOptionPane.showMessageDialog(this, "Invalid email format!", "Error", JOptionPane.ERROR_MESSAGE);
             return;

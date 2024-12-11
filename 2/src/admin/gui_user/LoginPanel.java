@@ -12,7 +12,6 @@ public class LoginPanel extends JPanel {
     private JButton loginButton, registerButton;
 
     public LoginPanel() {
-
         // Set the layout to FlowLayout for better control over positioning
         setLayout(new GridLayout(4, 4));
 
@@ -30,14 +29,14 @@ public class LoginPanel extends JPanel {
 
         // Buttons panel
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10)); // Center buttons
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10)); 
 
         loginButton = new JButton("Login");
-        loginButton.setPreferredSize(new Dimension(100, 30)); // Set button size
+        loginButton.setPreferredSize(new Dimension(100, 30)); 
         buttonPanel.add(loginButton);
 
         registerButton = new JButton("Register");
-        registerButton.setPreferredSize(new Dimension(100, 30)); // Set button size
+        registerButton.setPreferredSize(new Dimension(100, 30));
         buttonPanel.add(registerButton);
 
         add(buttonPanel);

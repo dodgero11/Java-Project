@@ -60,7 +60,7 @@ public class UserManagementPanel extends JPanel {
         userTable.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                if (evt.getClickCount() == 2) { // Double-click event
+                if (evt.getClickCount() == 2) { // Double-click for unnecessary mis-clicks
                     int row = userTable.getSelectedRow();
                     if (row != -1) {
                         String username = userTable.getValueAt(row, 0).toString(); // Fetch username
@@ -175,7 +175,7 @@ public class UserManagementPanel extends JPanel {
         User newUser = new User(username, password, fullName, address, Date.valueOf(birthDate), gender, email);
         if (userService.addUser(newUser)) {
             JOptionPane.showMessageDialog(this, "User added successfully!");
-            refreshUserTable(); // Refresh UI table
+            refreshUserTable();
         }
     }
 
@@ -188,7 +188,7 @@ public class UserManagementPanel extends JPanel {
                 boolean success = userService.removeUser(username.trim());
                 if (success) {
                     JOptionPane.showMessageDialog(this, "User deleted successfully.");
-                    refreshUserTable(); // Refresh UI table
+                    refreshUserTable(); 
                 } else {
                     JOptionPane.showMessageDialog(this, "User not found or could not be deleted.");
                 }
@@ -204,7 +204,7 @@ public class UserManagementPanel extends JPanel {
         UserService userService = new UserService();
 
         try {
-            List<User> users = userService.getAllUsers(); // Fetch users from DB
+            List<User> users = userService.getAllUsers(); 
             for (User user : users) {
                 model.addRow(new Object[]{
                     user.getUsername(),
@@ -222,6 +222,7 @@ public class UserManagementPanel extends JPanel {
         }
     }
 
+    // Open user details
     private void openUserDetails(String username) {
         JFrame userDetailsFrame = new JFrame("User Details - " + username);
         userDetailsFrame.setSize(600, 400);
