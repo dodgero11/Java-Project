@@ -1,11 +1,10 @@
-package gui;
+package gui_admin;
 
+import bll.SpamReport;
+import bll.SpamReportService;
 import java.awt.BorderLayout;
-import java.util.List;
-
 import java.awt.FlowLayout;
-import java.sql.SQLException;
-
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -17,11 +16,6 @@ import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
-import bll.SpamReport;
-import bll.SpamReportService;
-import bll.User;
-import bll.UserService;
-
 public class SpamReportsPanel extends JPanel {
 
     private JTable spamReportsTable;
@@ -31,7 +25,7 @@ public class SpamReportsPanel extends JPanel {
         setLayout(new BorderLayout());
 
         // Table columns
-        String[] columns = {"Report ID", "Reported By", "Reported User", "Reason", "Status", "Created At"};
+        String[] columns = { "Report ID", "Reported By", "Reported User", "Reason", "Status", "Created At" };
         DefaultTableModel model = new DefaultTableModel(columns, 0);
         spamReportsTable = new JTable(model);
         JScrollPane tableScrollPane = new JScrollPane(spamReportsTable);
@@ -106,13 +100,13 @@ public class SpamReportsPanel extends JPanel {
         try {
             List<SpamReport> spamReports = spamReportService.getSpamReports();
             for (SpamReport spamReport : spamReports) {
-                model.addRow(new Object[]{
-                    spamReport.getReportId(),
-                    spamReport.getReportedBy(),
-                    spamReport.getReportedUser(),
-                    spamReport.getReason(),
-                    spamReport.getStatus(),
-                    spamReport.getCreatedAt()
+                model.addRow(new Object[] {
+                        spamReport.getReportId(),
+                        spamReport.getReportedBy(),
+                        spamReport.getReportedUser(),
+                        spamReport.getReason(),
+                        spamReport.getStatus(),
+                        spamReport.getCreatedAt()
                 });
             }
         } catch (Exception e) {
@@ -120,8 +114,8 @@ public class SpamReportsPanel extends JPanel {
         }
     }
 
-    private void openSpamReportDetails(String id) {
-        JFrame spamReportDetailsFrame = new JFrame("Spam Report Details - " + id);
+    private void openSpamReportDetails(String username) {
+        JFrame spamReportDetailsFrame = new JFrame("Spam Report Details - " + username);
         spamReportDetailsFrame.setSize(600, 400);
         spamReportDetailsFrame.setLocationRelativeTo(this);
         spamReportDetailsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -129,7 +123,7 @@ public class SpamReportsPanel extends JPanel {
         SpamReportService spamReportService = new SpamReportService();
         SpamReport spamReport = null;
         try {
-            spamReport = spamReportService.getSpamReportById(id);
+            spamReport = spamReportService.getSpamReportById(username);
         } catch (Exception e) {
             e.printStackTrace();
         }

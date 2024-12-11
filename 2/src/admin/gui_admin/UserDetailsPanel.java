@@ -1,4 +1,4 @@
-package gui;
+package gui_admin;
 
 import bll.User;
 import bll.UserService;
@@ -9,14 +9,15 @@ import java.sql.Date;
 import javax.swing.*;
 
 public class UserDetailsPanel extends JPanel {
+
+    private User currentUser;
+    private UserService userService;
+
     private JLabel usernameLabel, fullNameLabel, addressLabel, birthDateLabel, emailLabel, genderLabel, statusLabel, passwordLabel;
     private JButton editInfoButton, deactivateButton, activateButton;
 
-    private User user;
-    private UserService userService;
-
     public UserDetailsPanel(User user) {
-        this.user = user;
+        this.currentUser = user;
         this.userService = new UserService();
 
         setLayout(new BorderLayout(1, 1));
@@ -92,28 +93,28 @@ public class UserDetailsPanel extends JPanel {
         JPanel inputPanel = new JPanel(new GridLayout(6, 2, 10, 10));
 
         inputPanel.add(new JLabel("Full Name:"));
-        JTextField fullNameField = new JTextField(user.getFullName());
+        JTextField fullNameField = new JTextField(currentUser.getFullName());
         inputPanel.add(fullNameField);
 
         inputPanel.add(new JLabel("Password:"));
-        JTextField passwordField = new JTextField(user.getPassword());
+        JTextField passwordField = new JTextField(currentUser.getPassword());
         inputPanel.add(passwordField);
 
         inputPanel.add(new JLabel("Address:"));
-        JTextField addressField = new JTextField(user.getAddress());
+        JTextField addressField = new JTextField(currentUser.getAddress());
         inputPanel.add(addressField);
 
         inputPanel.add(new JLabel("Birth Date (YYYY-MM-DD):"));
-        JTextField birthDateField = new JTextField(user.getBirthDate().toString());
+        JTextField birthDateField = new JTextField(currentUser.getBirthDate().toString());
         inputPanel.add(birthDateField);
 
         inputPanel.add(new JLabel("Email:"));
-        JTextField emailField = new JTextField(user.getEmail());
+        JTextField emailField = new JTextField(currentUser.getEmail());
         inputPanel.add(emailField);
 
         inputPanel.add(new JLabel("Gender:"));
         JComboBox<String> genderComboBox = new JComboBox<>(new String[]{"Male", "Female"});
-        genderComboBox.setSelectedItem(user.getGender());
+        genderComboBox.setSelectedItem(currentUser.getGender());
         inputPanel.add(genderComboBox);
 
         int result = JOptionPane.showConfirmDialog(this, inputPanel, "Edit User Info", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -146,15 +147,15 @@ public class UserDetailsPanel extends JPanel {
                 return;
             }
 
-            user.setFullName(fullName);
-            user.setPassword(password);
-            user.setAddress(address);
-            user.setBirthDate(Date.valueOf(birthDate));
-            user.setEmail(email);
-            user.setGender(gender);
+            currentUser.setFullName(fullName);
+            currentUser.setPassword(password);
+            currentUser.setAddress(address);
+            currentUser.setBirthDate(Date.valueOf(birthDate));
+            currentUser.setEmail(email);
+            currentUser.setGender(gender);
 
             try {
-                if (userService.updateUser(user)) {
+                if (userService.updateUser(currentUser)) {
                     JOptionPane.showMessageDialog(this, "User information updated successfully!");
                     refreshUserInfo(); // Reload updated data
                 } else {
@@ -170,8 +171,8 @@ public class UserDetailsPanel extends JPanel {
         int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to deactivate this account?", "Deactivate Account", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                user.setIsActive("Deactivated");
-                if (userService.updateUser(user)) {
+                currentUser.setIsActive("Deactivated");
+                if (userService.updateUser(currentUser)) {
                     JOptionPane.showMessageDialog(this, "Account deactivated successfully!");
                     statusLabel.setText("Deactivated");
                 } else {
@@ -187,8 +188,8 @@ public class UserDetailsPanel extends JPanel {
         int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to activate this account?", "Activate Account", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                user.setIsActive("Active");
-                if (userService.updateUser(user)) {
+                currentUser.setIsActive("Active");
+                if (userService.updateUser(currentUser)) {
                     JOptionPane.showMessageDialog(this, "Account activated successfully!");
                     statusLabel.setText("Active");
                 } else {
@@ -203,14 +204,14 @@ public class UserDetailsPanel extends JPanel {
     private void refreshUserInfo() {
         // Refresh the panel with updated user data
         try {
-            this.user = userService.getUsersByUsername(user.getUsername()).get(0);
-            passwordLabel.setText(user.getPassword());
-            fullNameLabel.setText(user.getFullName());
-            addressLabel.setText(user.getAddress());
-            birthDateLabel.setText(user.getBirthDate().toString());
-            emailLabel.setText(user.getEmail());
-            genderLabel.setText(user.getGender());
-            statusLabel.setText(user.getIsActive());
+            this.currentUser = userService.getUsersByUsername(currentUser.getUsername()).get(0);
+            passwordLabel.setText(currentUser.getPassword());
+            fullNameLabel.setText(currentUser.getFullName());
+            addressLabel.setText(currentUser.getAddress());
+            birthDateLabel.setText(currentUser.getBirthDate().toString());
+            emailLabel.setText(currentUser.getEmail());
+            genderLabel.setText(currentUser.getGender());
+            statusLabel.setText(currentUser.getIsActive());
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "An error occurred while refreshing user data: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }

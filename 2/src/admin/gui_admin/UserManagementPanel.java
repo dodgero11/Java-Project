@@ -1,4 +1,4 @@
-package gui;
+package gui_admin;
 
 import bll.User;
 import bll.UserService;
@@ -22,7 +22,7 @@ public class UserManagementPanel extends JPanel {
 
         // Filter text field
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        filterTextField = new JTextField(20); // 20 columns wide
+        filterTextField = new JTextField(20);
         filterPanel.add(new JLabel("Filter:"));
         filterPanel.add(filterTextField);
 
@@ -95,9 +95,7 @@ public class UserManagementPanel extends JPanel {
         refreshUserTable();
     }
 
-    // Add a new user (you will integrate this with your service/database layer later)
     private void addUser() {
-        // Create temporary variables to hold user data
         String username = "";
         String password = "";
         String fullName = "";
@@ -157,9 +155,9 @@ public class UserManagementPanel extends JPanel {
                 return;
             }
 
-            // Validate birthdate format
-            if (!birthDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
-                JOptionPane.showMessageDialog(this, "Birthdate must be in YYYY-MM-DD format!", "Error", JOptionPane.ERROR_MESSAGE);
+            // Validate Email format
+            if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+                JOptionPane.showMessageDialog(this, "Invalid email format!", "Error", JOptionPane.ERROR_MESSAGE);
                 addUser();
                 return;
             }
@@ -167,13 +165,6 @@ public class UserManagementPanel extends JPanel {
             // Validate birthdate format
             if (!birthDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
                 JOptionPane.showMessageDialog(this, "Birthdate must be in YYYY-MM-DD format!", "Error", JOptionPane.ERROR_MESSAGE);
-                addUser();
-                return;
-            }
-
-            // Validate email format
-            if (!email.contains("@")) {
-                JOptionPane.showMessageDialog(this, "Invalid email format! Must contain '@'", "Error", JOptionPane.ERROR_MESSAGE);
                 addUser();
                 return;
             }

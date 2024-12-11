@@ -1,4 +1,4 @@
-package gui;
+package gui_admin;
 
 import java.awt.*;
 import javax.swing.*;
@@ -63,9 +63,8 @@ public class AdminDashboardPanel extends JFrame {
     }
 
     private void showGroupManagement() {
-        // You can create and show the Group Management panel here
         mainPanel.removeAll();
-        mainPanel.add(new GroupManagementPanel());  // Assuming you have a GroupManagementPanel created
+        mainPanel.add(new GroupManagementPanel());
         mainPanel.revalidate();
         mainPanel.repaint();
     }
@@ -78,9 +77,8 @@ public class AdminDashboardPanel extends JFrame {
     }
 
     private void showSpamReportsPanel() {
-        // You can create and show the Spam Reports panel here
         mainPanel.removeAll();
-        mainPanel.add(new SpamReportsPanel());  // Assuming you have a SpamReportsPanel created
+        mainPanel.add(new SpamReportsPanel()); 
         mainPanel.revalidate();
         mainPanel.repaint();
     }

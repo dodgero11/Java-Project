@@ -1,15 +1,14 @@
-package gui;
+package gui_admin;
 
 import bll.SpamReport;
 import bll.SpamReportService;
 import bll.UserService;
-
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class SpamReportDetailsPanel extends JPanel {
 
-    private JLabel reporterLabel, reportedUserLabel, statusPanel, reportReasonLabel, reportStatusLabel;
+    private JLabel reporterLabel, reportedUserLabel, reportReasonLabel, reportStatusLabel;
     private JButton deactivateUserButton, dismissReportButton;
     private SpamReport spamReport;
 

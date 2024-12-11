@@ -1,4 +1,4 @@
-package gui;
+package gui_admin;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
