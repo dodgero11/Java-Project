@@ -1,0 +1,9 @@
+{
+    "java.project.sourcePaths": [
+        "admin"
+    ],
+    "java.project.referencedLibraries": [
+        "d:\\GitHub\\logic-project\\.git\\Java-Project\\2\\src\\lib\\mysql-connector-j-9.1.0.jar"
+    ],
+    "java.project.outputPath": "jar"
+}

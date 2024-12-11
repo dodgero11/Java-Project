@@ -75,7 +75,7 @@ public class SearchUsersPanel extends JPanel {
                 if (row != -1) {
                     usersTable.setRowSelectionInterval(row, row); 
         
-                    if (evt.getClickCount() == 2) { // Double-click for unnecessary mis-click
+                    if (evt.getClickCount() == 2) { // Double-click for unnecessary mis-clicks
                         selectedUsername = usersTable.getValueAt(row, 0).toString();
                         rightClickMenu.show(evt.getComponent(), evt.getX(), evt.getY());
                     }
