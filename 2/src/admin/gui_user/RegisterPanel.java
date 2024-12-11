@@ -46,7 +46,7 @@ public class RegisterPanel extends JPanel {
         add(birthDateField);
 
         registerButton = new JButton("Register");
-        add(new JLabel()); // Spacer
+        add(new JLabel());
         add(registerButton);
 
         // Action Listener
@@ -60,7 +60,7 @@ public class RegisterPanel extends JPanel {
         String email = emailField.getText();
         String gender = (String) genderComboBox.getSelectedItem();
         String birthDate = birthDateField.getText();
-        String address = "";
+        String address = addressField.getText();
 
         if (username.isEmpty() || password.isEmpty() || email.isEmpty() || fullName.isEmpty() || birthDate.isEmpty()) {
             JOptionPane.showMessageDialog(this, "All fields must be filled!", "Error", JOptionPane.ERROR_MESSAGE);

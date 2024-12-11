@@ -66,7 +66,8 @@ public class LoginPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Invalid username or password.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    
+    // Open the register panel
     private void openRegisterPanel() {
         JFrame registerFrame = new JFrame("Register");
         registerFrame.setSize(400, 300);
@@ -76,11 +77,12 @@ public class LoginPanel extends JPanel {
         registerFrame.setVisible(true);
     }
 
+    // Open the user panel
     private void openUserPanel(String username) {
         JFrame userFrame = new JFrame("Welcome - " + username);
         userFrame.setSize(800, 600);
         userFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        userFrame.add(new UserHomePanel(username, userFrame)); // Create UserHomePanel for logged-in functionalities
+        userFrame.add(new UserHomePanel(username, userFrame));
         userFrame.setLocationRelativeTo(this);
         userFrame.setVisible(true);
 

@@ -12,16 +12,22 @@ public class UserDAO {
 
     private Connection getConnection() throws SQLException {
         try {
+
+            // Load the MySQL JDBC driver
             Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Test the connection
             Connection temp_connection = DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (ClassNotFoundException e) {
             System.err.println("JDBC Driver not found: " + e.getMessage());
         } catch (SQLException e) {
             System.err.println("Error connecting to the database: " + e.getMessage());
         }
+        // Return the connection
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
+    // Get all users
     public List<User> getAllUsers() throws SQLException {
         List<User> users = new ArrayList<>();
         String query = "SELECT username, password, full_name, address, email, gender, birth_date, status, created_at FROM users";
@@ -96,7 +102,7 @@ public class UserDAO {
         }
     }
 
-    // Search for users by name or username
+    // Search for users by username
     public List<User> getUsersByUsername(String searchTerm) {
         String sql = "SELECT * FROM users WHERE username LIKE ?";
         List<User> users = new ArrayList<>();
@@ -122,19 +128,22 @@ public class UserDAO {
         return users;
     }
 
+    // Send a friend request
     public boolean sendFriendRequest(String user1, String user2) throws SQLException {
-        // SQL to ensure no existing relationship in either direction
-        String checkSql = """
-                        SELECT COUNT(*) FROM USER_FRIENDS
-                        WHERE ((user_username = ? AND friend_username = ?)
-                        OR (user_username = ? AND friend_username = ?))
-                        OR (user_username = ? AND friend_username = ? AND status = 'Blocked')
-                        """;
 
+        // Check for existing relationship
+        String checkSql = """
+                SELECT COUNT(*) FROM USER_FRIENDS
+                WHERE ((user_username = ? AND friend_username = ?)
+                OR (user_username = ? AND friend_username = ?))
+                OR (user_username = ? AND friend_username = ? AND status = 'Blocked')
+                """;
+
+        // Insert into USER_FRIENDS table
         String insertSql = """
-                        INSERT INTO USER_FRIENDS (user_username, friend_username, status)
-                        VALUES (?, ?, ?)
-                        """;
+                INSERT INTO USER_FRIENDS (user_username, friend_username, status)
+                VALUES (?, ?, ?)
+                """;
 
         try (Connection conn = getConnection();
                 PreparedStatement checkStmt = conn.prepareStatement(checkSql);
@@ -166,22 +175,26 @@ public class UserDAO {
         }
     }
 
+    // Get pending friend requests
     public List<User> getPendingFriendRequests(String username) throws SQLException {
+
+        // SQL to retrieve pending friend requests
         String sql = """
-                    SELECT u.*
-                    FROM USERS u
-                    JOIN USER_FRIENDS uf
-                        ON ((u.username = uf.user_username AND uf.friend_username = (
-                            SELECT username FROM USERS WHERE username = ?)))
-                        AND (uf.status = 'Pending')
-                        AND (u.username != ?);
-                    """;
+                SELECT u.*
+                FROM USERS u
+                JOIN USER_FRIENDS uf
+                    ON ((u.username = uf.user_username AND uf.friend_username = (
+                        SELECT username FROM USERS WHERE username = ?)))
+                    AND (uf.status = 'Pending')
+                    AND (u.username != ?);
+                """;
         List<User> users = new ArrayList<>();
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            // Set the username parameter twice for the subqueries
+
             stmt.setString(1, username);
             stmt.setString(2, username);
             ResultSet rs = stmt.executeQuery();
+
             while (rs.next()) {
                 User user = new User();
                 user.setUsername(rs.getString("username"));
@@ -214,7 +227,10 @@ public class UserDAO {
         }
     }
 
+    // Reject a friend request
     public boolean rejectFriendRequest(String user1, String user2) throws SQLException {
+
+        // Delete the friend request
         String sql = "DELETE FROM USER_FRIENDS WHERE user_username = ? AND friend_username = ?";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user1);
@@ -226,7 +242,10 @@ public class UserDAO {
         }
     }
 
+    // Remove a friend
     public boolean removeFriend(String user1, String user2) throws SQLException {
+
+        // Remove the friend
         String sql = "DELETE FROM USER_FRIENDS WHERE (user_username = ? AND friend_username = ?) OR (user_username = ? AND friend_username = ?)";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user1);
@@ -240,21 +259,22 @@ public class UserDAO {
         }
     }
 
+    // Get friends by username
     public List<User> getFriendsByUsername(String username) throws SQLException {
+        // Query to retrieve friends 
         String sql = """
-                    SELECT u.*
-                    FROM USERS u
-                    JOIN USER_FRIENDS uf
-                        ON ((u.username = uf.friend_username AND uf.user_username = (
-                            SELECT username FROM USERS WHERE username = ?))
-                        OR (u.username = uf.user_username AND uf.friend_username = (
-                            SELECT username FROM USERS WHERE username = ?)))
-                        AND (uf.status = 'Accepted')
-                        AND (u.username != ?);
-                    """;
+                SELECT u.*
+                FROM USERS u
+                JOIN USER_FRIENDS uf
+                    ON ((u.username = uf.friend_username AND uf.user_username = (
+                        SELECT username FROM USERS WHERE username = ?))
+                    OR (u.username = uf.user_username AND uf.friend_username = (
+                        SELECT username FROM USERS WHERE username = ?)))
+                    AND (uf.status = 'Accepted')
+                    AND (u.username != ?);
+                """;
         List<User> users = new ArrayList<>();
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            // Set the username parameter twice for the subqueries
             stmt.setString(1, username);
             stmt.setString(2, username);
             stmt.setString(3, username);
@@ -281,22 +301,27 @@ public class UserDAO {
     public boolean blockUser(String currentUser, String targetUser) throws SQLException {
         // Check if the relationship already exists
         String checkSql = """
-                        SELECT status FROM USER_FRIENDS
-                        WHERE user_username = ? AND friend_username = ?
-                        """;
-        // Update or insert into USER_FRIENDS table
+                SELECT status FROM USER_FRIENDS
+                WHERE user_username = ? AND friend_username = ?
+                """;
+
+        // Update USER_FRIENDS table if already existed
         String updateSql = """
-                        UPDATE USER_FRIENDS
-                        SET status = 'Blocked'
-                        WHERE user_username = ? AND friend_username = ?
-                        """;
+                UPDATE USER_FRIENDS
+                SET status = 'Blocked'
+                WHERE user_username = ? AND friend_username = ?
+                """;
+        
+        // Delete existing relationship
         String deleteSql = """
-                        DELETE FROM USER_FRIENDS WHERE user_username = ? AND friend_username = ?
-                        """;
+                DELETE FROM USER_FRIENDS WHERE user_username = ? AND friend_username = ?
+                """;
+
+        // Insert into USER_FRIENDS table if not existed
         String insertSql = """
-                        INSERT INTO USER_FRIENDS (user_username, friend_username, status)
-                        VALUES (?, ?, 'Blocked')
-                        """;
+                INSERT INTO USER_FRIENDS (user_username, friend_username, status)
+                VALUES (?, ?, 'Blocked')
+                """;
 
         try (Connection conn = getConnection();
                 PreparedStatement checkStmt = conn.prepareStatement(checkSql);
@@ -309,6 +334,7 @@ public class UserDAO {
             checkStmt.setString(2, targetUser);
             try (ResultSet rs = checkStmt.executeQuery()) {
                 if (rs.next()) {
+
                     // If relationship exists, update to 'Blocked'
                     updateStmt.setString(1, currentUser);
                     updateStmt.setString(2, targetUser);
@@ -320,6 +346,7 @@ public class UserDAO {
 
                     return updateStmt.executeUpdate() > 0;
                 } else {
+
                     // If no relationship exists, insert 'Blocked'
                     insertStmt.setString(1, currentUser);
                     insertStmt.setString(2, targetUser);
@@ -337,6 +364,7 @@ public class UserDAO {
         }
     }
 
+    // Unblock a user
     public boolean unblockUser(String currentUser, String targetUser) throws SQLException {
         String sql = "DELETE FROM USER_FRIENDS WHERE user_username = ? AND friend_username = ? AND status = 'Blocked'";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -349,6 +377,7 @@ public class UserDAO {
         }
     }
 
+    // Register a new user
     public boolean registerUser(User user) {
         String sql = "INSERT INTO USERS (username, password, full_name, email, gender, address, birth_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {

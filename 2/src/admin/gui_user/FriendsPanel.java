@@ -101,6 +101,8 @@ public class FriendsPanel extends JPanel {
         }
     }
 
+
+    // Remove friend
     private void removeFriend() {
         int selectedRow = friendsTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -114,6 +116,7 @@ public class FriendsPanel extends JPanel {
                 "Are you sure you want to remove " + friendUsername + " as a friend?", "Confirm",
                 JOptionPane.YES_NO_OPTION);
 
+        // Remove friend
         if (confirm == JOptionPane.YES_OPTION) {
             boolean success = false;
             try {
@@ -137,6 +140,7 @@ public class FriendsPanel extends JPanel {
         requestsFrame.setSize(400, 300);
         requestsFrame.setLocationRelativeTo(this);
 
+        // Table to display friend requests
         String[] columns = { "Name", "Action" };
         DefaultTableModel model = new DefaultTableModel(columns, 0);
         JTable requestsTable = new JTable(model);
@@ -163,7 +167,7 @@ public class FriendsPanel extends JPanel {
         requestsFrame.add(tableScrollPane, BorderLayout.CENTER);
         requestsFrame.add(buttonPanel, BorderLayout.SOUTH);
 
-        // Action listeners
+        // Accept button
         acceptButton.addActionListener(e -> {
             int selectedRow = requestsTable.getSelectedRow();
             if (selectedRow == -1) {
@@ -172,12 +176,15 @@ public class FriendsPanel extends JPanel {
                 return;
             }
             boolean success = false;
+            
             String requesterUsername = requestsTable.getValueAt(selectedRow, 0).toString();
             try {
                 success = userService.acceptFriendRequest(requesterUsername, currentUser.getUsername());
             } catch (Exception e2) {
                 e2.printStackTrace();
             }
+
+            // Accept friend request
             if (success) {
                 JOptionPane.showMessageDialog(requestsFrame, "Friend request accepted.", "Success",
                         JOptionPane.INFORMATION_MESSAGE);
@@ -188,6 +195,8 @@ public class FriendsPanel extends JPanel {
             }
         });
 
+
+        // Decline button
         declineButton.addActionListener(e -> {
             int selectedRow = requestsTable.getSelectedRow();
             if (selectedRow == -1) {
@@ -196,6 +205,7 @@ public class FriendsPanel extends JPanel {
                 return;
             }
 
+            // Decline friend request
             String requesterUsername = requestsTable.getValueAt(selectedRow, 0).toString();
             boolean success = false;
             try {
@@ -203,6 +213,8 @@ public class FriendsPanel extends JPanel {
             } catch (Exception e3) {
                 e3.printStackTrace();
             }
+
+            // Decline friend request
             if (success) {
                 JOptionPane.showMessageDialog(requestsFrame, "Friend request rejected.", "Success",
                         JOptionPane.INFORMATION_MESSAGE);
@@ -217,12 +229,15 @@ public class FriendsPanel extends JPanel {
         requestsFrame.setVisible(true);
     }
 
+    // Open user details
     private void openUserDetails() {
         int selectedRow = friendsTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Please select a user first.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+
+        // Get the username of the selected user
         String username = friendsTable.getValueAt(selectedRow, 0).toString();
         User user = null;
         try {
@@ -241,6 +256,7 @@ public class FriendsPanel extends JPanel {
                 "User Profile", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    // Block user
     private void blockUser() {
         int selectedRow = friendsTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -248,6 +264,7 @@ public class FriendsPanel extends JPanel {
             return;
         }
 
+        // Get the username of the selected user
         String username = friendsTable.getValueAt(selectedRow, 0).toString();
         int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to block " + username + "?",
                 "Confirm Block", JOptionPane.YES_NO_OPTION);

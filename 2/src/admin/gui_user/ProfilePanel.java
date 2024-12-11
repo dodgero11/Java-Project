@@ -19,7 +19,7 @@ public class ProfilePanel extends JPanel {
         setLayout(new GridLayout(0, 2, 10, 10));
 
         // UserService to fetch user information
-        UserService userService = new UserService();
+        userService = new UserService();
         try {
             currentUser = userService.getUsersByUsername(username).get(0);
         } catch (Exception e) {
@@ -134,11 +134,13 @@ public class ProfilePanel extends JPanel {
             String newPassword = new String(newPasswordField.getPassword());
             String confirmPassword = new String(confirmPasswordField.getPassword());
 
+            // Check if current password is correct
             if (!user.getPassword().equals(currentPassword)) {
                 JOptionPane.showMessageDialog(this, "Current password is incorrect!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
+            // Check if new passwords match
             if (!newPassword.equals(confirmPassword)) {
                 JOptionPane.showMessageDialog(this, "New passwords do not match!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;

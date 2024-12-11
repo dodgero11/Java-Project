@@ -146,7 +146,7 @@ public class SearchUsersPanel extends JPanel {
         String username = usersTable.getValueAt(selectedRow, 0).toString();
         JOptionPane.showMessageDialog(this, "Starting chat with: " + username);
 
-        // Call chat starting functionality here
+        // Chat will be implemented later
         // userService.startChat(currentUser.getUsername(), username);
     }
 
