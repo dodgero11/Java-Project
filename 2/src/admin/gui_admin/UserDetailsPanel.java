@@ -83,7 +83,7 @@ public class UserDetailsPanel extends JPanel {
         JTabbedPane tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Friends", new FriendsPanel(user.getUsername()));
-        // tabbedPane.addTab("Login History", new LoginHistoryPanel(user.getUsername()));
+        tabbedPane.addTab("Login History", new LoginHistoryPanel(user.getUsername()));
 
         add(tabbedPane, BorderLayout.CENTER);
     }

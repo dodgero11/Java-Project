@@ -85,6 +85,26 @@ public class LoginPanel extends JPanel {
         userFrame.setLocationRelativeTo(this);
         userFrame.setVisible(true);
 
+        // Set user as online
+        UserService userService = new UserService();
+        try {
+            userService.UserOnline(username);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Set user as offline if the frame is closed
+        userFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                try {
+                    userService.UserOffline(username);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         // Close the login frame (if needed)
         SwingUtilities.getWindowAncestor(this).dispose();
     }

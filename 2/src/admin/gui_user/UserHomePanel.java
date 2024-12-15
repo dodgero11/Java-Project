@@ -31,7 +31,7 @@ public class UserHomePanel extends JPanel {
         // Chats Menu
         JMenu chatsMenu = new JMenu("Chats");
         JMenuItem chatMenuItem = new JMenuItem("View chats");
-    
+
         chatsMenu.add(chatMenuItem);
         menuBar.add(chatsMenu);
         
@@ -78,14 +78,14 @@ public class UserHomePanel extends JPanel {
 
     private void showChatPanel() {
         mainPanel.removeAll();
-        //mainPanel.add(new ChatPanel(currentUser.getUsername()));
+        mainPanel.add(new ChatPanel(currentUser.getUsername()));
         mainPanel.revalidate();
         mainPanel.repaint();
     }
 
     private void showGroupsPanel() {
         mainPanel.removeAll();
-        //mainPanel.add(new GroupsPanel(currentUser.getUsername()));
+        mainPanel.add(new GroupPanel(currentUser.getUsername()));
         mainPanel.revalidate();
         mainPanel.repaint();
     }

@@ -204,7 +204,7 @@ public class UserManagementPanel extends JPanel {
         UserService userService = new UserService();
 
         try {
-            List<User> users = userService.getAllUsers(); 
+            List<User> users = userService.getAllUsers(""); 
             for (User user : users) {
                 model.addRow(new Object[]{
                     user.getUsername(),

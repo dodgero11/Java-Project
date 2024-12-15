@@ -29,19 +29,19 @@ public class AdminDashboardPanel extends JFrame {
         groupMenu.add(viewGroups);
         menuBar.add(groupMenu);
 
-        // Login History Panel
-        JMenu loginHistoryMenu = new JMenu("Login History");
-        JMenuItem viewLoginHistory = new JMenuItem("View Login History");
-
-        loginHistoryMenu.add(viewLoginHistory);
-        menuBar.add(loginHistoryMenu);
-
         // Spam Reports Panel
         JMenu spamReportsMenu = new JMenu("Spam Reports");
         JMenuItem viewSpamReports = new JMenuItem("View Spam Reports");
 
         spamReportsMenu.add(viewSpamReports);
         menuBar.add(spamReportsMenu);
+
+        // User Friends Panel
+        JMenu userFriendsMenu = new JMenu("User Friends");
+        JMenuItem viewUserFriends = new JMenuItem("View User Friends");
+
+        userFriendsMenu.add(viewUserFriends);
+        menuBar.add(userFriendsMenu);
 
         // Main panel
         setJMenuBar(menuBar);
@@ -51,8 +51,8 @@ public class AdminDashboardPanel extends JFrame {
         // Event Listeners
         viewUsers.addActionListener(e -> showUserManagement());
         viewGroups.addActionListener(e -> showGroupManagement());
-        viewLoginHistory.addActionListener(e -> showLoginHistory());
         viewSpamReports.addActionListener(e -> showSpamReportsPanel());
+        viewUserFriends.addActionListener(e -> showFriendPanel());
     }
 
     private void showUserManagement() {
@@ -69,16 +69,16 @@ public class AdminDashboardPanel extends JFrame {
         mainPanel.repaint();
     }
 
-    private void showLoginHistory() {
+    private void showSpamReportsPanel() {
         mainPanel.removeAll();
-        mainPanel.add(new LoginHistoryPanel());
+        mainPanel.add(new SpamReportsPanel()); 
         mainPanel.revalidate();
         mainPanel.repaint();
     }
 
-    private void showSpamReportsPanel() {
+    private void showFriendPanel() {
         mainPanel.removeAll();
-        mainPanel.add(new SpamReportsPanel()); 
+        mainPanel.add(new UserFriendsPanel()); 
         mainPanel.revalidate();
         mainPanel.repaint();
     }

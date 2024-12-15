@@ -22,4 +22,8 @@ public class SpamReportService {
     public void dismissReport(String reportId) throws SQLException {
         SpamReportDAO.dismissReport(reportId);
     }
+
+    public boolean reportSpam(String reporterUsername, String reportedUsername, String description) throws Exception {
+        return SpamReportDAO.reportSpam(reporterUsername, reportedUsername, description);
+    }
 }

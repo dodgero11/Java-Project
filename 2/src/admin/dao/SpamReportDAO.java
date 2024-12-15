@@ -1,33 +1,32 @@
 package dao;
 
 import bll.SpamReport;
+import common.ConfigReader;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SpamReportDAO {
-    private static final String URL = "jdbc:mysql://localhost:3306/java";
-    private static final String USER = "root";
-    private static final String PASSWORD = "7z9aZbse928WJUf";
 
     private Connection getConnection() throws SQLException {
+        // Get the database connection details
+        String URL = ConfigReader.get("db.url");
+        String USER = ConfigReader.get("db.username");
+        String PASSWORD = ConfigReader.get("db.password");
+    
         try {
-
             // Load the MySQL JDBC driver
             Class.forName("com.mysql.cj.jdbc.Driver");
-
-            // Test the connection
-            Connection temp_connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            // Return the connection
+            return DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (ClassNotFoundException e) {
             System.err.println("JDBC Driver not found: " + e.getMessage());
+            throw new SQLException("Database driver initialization failed", e);
         } catch (SQLException e) {
             System.err.println("Error connecting to the database: " + e.getMessage());
+            throw e; // Rethrow to allow upstream handling
         }
-
-        // Return the connection
-        return DriverManager.getConnection(URL, USER, PASSWORD);
     }
-
     // Get all spam reports
     public List<SpamReport> getSpamReports() throws SQLException {
         String sql = "SELECT report_id, reported_by, reported_user, reason, status, created_at FROM SPAM_REPORTS";
@@ -82,5 +81,20 @@ public class SpamReportDAO {
             stmt.setString(1, reportId);
             stmt.executeUpdate();
         }
+    }
+
+    // Report a user as spam
+    public boolean reportSpam(String reporterUsername, String reportedUsername, String description) throws Exception {
+        String sql = "INSERT INTO SPAM_REPORTS (reported_by, reported_user, reason) VALUES (?, ?, ?)";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, reporterUsername);
+            stmt.setString(2, reportedUsername);
+            stmt.setString(3, description);
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
