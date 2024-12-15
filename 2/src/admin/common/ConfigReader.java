@@ -8,7 +8,7 @@ public class ConfigReader {
     private static Properties properties = new Properties();
 
     static {
-        try (FileInputStream fis = new FileInputStream("../config/db_config.properties")) {
+        try (FileInputStream fis = new FileInputStream("db_config.properties")) {
             properties.load(fis);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load configuration file", e);
